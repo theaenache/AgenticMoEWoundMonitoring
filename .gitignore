@@ -1,0 +1,26 @@
+# Checkpoints and model weights
+*.pt
+*.pth
+*.bin
+*.safetensors
+checkpoints/
+outputs/*/model*.pt
+
+# Caption JSONs (large, regenerate from scripts)
+captions/
+
+# Data
+data/
+*.zip
+
+# Logs
+*.log
+logs/
+
+# Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# Conda
+llava_env/
