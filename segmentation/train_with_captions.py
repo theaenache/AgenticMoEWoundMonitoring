@@ -179,7 +179,22 @@ sched = CosineAnnealingLR(opt, T_max=args.epochs)
 history = []
 best_val_dice = 0.0
 
-for epoch in range(args.epochs):
+start_epoch = 0
+ckpt_path = f"{OUT}/checkpoint_latest.pt"
+if os.path.exists(ckpt_path):
+    ckpt = torch.load(ckpt_path, map_location=DEVICE)
+    model.load_state_dict(ckpt['model'])
+    opt.load_state_dict(ckpt['optimizer'])
+    sched.load_state_dict(ckpt['scheduler'])
+    best_val_dice = ckpt.get('best_val_dice', 0.0)
+    history = ckpt.get('history', [])
+    start_epoch = ckpt['epoch'] + 1
+    print(f'✓ Resumed from epoch {start_epoch}', flush=True)
+else:
+    print('✓ Starting from scratch', flush=True)
+
+
+for epoch in range(start_epoch, args.epochs):
     model.train()
     train_loss, train_dice = 0.0, 0.0
     t_epoch = time.time()
