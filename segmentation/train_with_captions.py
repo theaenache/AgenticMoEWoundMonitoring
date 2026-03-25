@@ -41,8 +41,7 @@ train_caps = load_caption_map(f"captions/{prefix}_fuseg_train.json")
 val_caps   = load_caption_map(f"captions/{prefix}_fuseg_val.json")
 print(f"✓ Captions loaded: {len(train_caps)} train, {len(val_caps)} val", flush=True)
 
-FALLBACK = ("diabetic foot ulcer wound with surrounding erythema "
-            "and tissue damage requiring wound care")
+FALLBACK = None
 
 class FUSegCaptioned(Dataset):
     def __init__(self, split="train", image_size=1008, caption_map=None):
@@ -85,7 +84,9 @@ class FUSegCaptioned(Dataset):
         else:
             x1, y1, x2, y2 = 0, 0, self.image_size-1, self.image_size-1
 
-        caption = self.caption_map.get(img_path.name, FALLBACK)
+        caption = self.caption_map.get(img_path.name)
+        if caption is None:
+            raise ValueError(f'No caption found for {img_path.name} — check caption JSON')
         return (torch.from_numpy(img).permute(2,0,1).float() / 255.0,
                 torch.from_numpy(lbl).unsqueeze(0),
                 torch.from_numpy(np.array([x1,y1,x2,y2], dtype=np.float32) / self.image_size),
